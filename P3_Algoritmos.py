@@ -46,7 +46,6 @@ def FCFS():
 		obj.update_tiempos(esp, resp, ret, fin)
 		print(obj.get_tabla())
 
-
 def SJB():
 	shortest = cola.copy()
 	shortest.sort(key=lambda x: x.t_eje)
@@ -78,22 +77,94 @@ def Round_Robin():
 	t_actual = 0
 	q=3
 	q_actual=0
+	cont = 0
+	tam = len(rr)
 	for obj in rr:
+		cont += 1
 		if obj.t_eje <= q:
-			resp = t_actual
+			resp = q_actual
 			t_actual += obj.t_eje
-			fin = t_actual
+			ret = q_actual + obj.t_eje
+			fin = ret
+			esp = ret - obj.t_eje
+			obj.update_tiempos(esp, resp, ret, fin)
+			q_actual += obj.t_eje
+			tam -= 1
+			print(obj.get_tabla())
+		else:
+			if obj.t_eje % 3 == 0:
+				trozos = obj.t_eje // q -1
+			else:
+				trozos = obj.t_eje // q
+			faltan = tam - cont
+			resp = q_actual
+			t_actual += obj.t_eje
+			q_actual += 3
+			fin = t_actual + (q*trozos*tam)
 			ret = fin - obj.t_lle
 			esp = ret - obj.t_eje
-			q_actual += obj.t_eje
 			obj.update_tiempos(esp, resp, ret, fin)
+			tam -= 1
 			print(obj.get_tabla())
 
-def menu():
-	print("Seleccione un algoritmo")
-	print("1) FCFS")
-	Round_Robin()
+def col_inicio(filename, proceso):
+        with open(filename) as file_obj:
+                contenido = file_obj.read()
+                
+        nuevo_cont = proceso + '\n' + contenido
         
-lista_procesos("procesos.txt")
+        with open(filename, 'w') as file_obj:
+                file_obj.write(nuevo_cont)
+                
+def col_final(filename, proceso):
+        with open(filename, "a") as file_obj:
+                linea = f"\n{proceso}"
+                file_obj.write(linea)
+
+def add_process():
+        while True:
+                nombre = input("Nombre del proceso: ")
+                tiempo = input("Tiempo de duración: ")
+                prio = input("Prioridad del proceso: ")
+                linea = nombre + ", " + tiempo + ", " + prio
+                posi = int(input("1)Colocar al principio\n2)Colocar al final\n3)Cancelar\nSeleccione una opcion: "))
+                if posi == 1:
+                        col_inicio("procesos.txt", linea)
+                        print(f"Se agrego el proceso {nombre} con duracion {tiempo} y prioridad {prio}")
+                elif posi == 2:
+                        col_final("procesos.txt", linea)
+                        print(f"Se agrego el proceso {nombre} con duracion {tiempo} y prioridad {prio}")
+                elif posi == 3:
+                        break
+                else:
+                        print("Ingrese una opcion valida")
+
+
+
+def menu():
+        while True:
+                if cola:
+                        cola.clear()
+                lista_procesos("procesos.txt")
+                print("Seleccione un algoritmo")
+                print("1)FCFS\n2)SJB\n3)Prioridades\n4) Round Robin\n5)Agregar Proceso\n6)Salir")
+                opcion = int(input("Ingrese un numero: "))
+                if opcion == 1:
+                        FCFS()
+                elif opcion == 2:
+                        SJB()
+                elif opcion == 3:
+                        Priority()
+                elif opcion == 4:
+                        Round_Robin()
+                elif opcion == 5:
+                        add_process()
+                elif opcion == 6:
+                        break
+                else:
+                        print("Ingrese un valor valido")
+
+	
+        
 menu()
 

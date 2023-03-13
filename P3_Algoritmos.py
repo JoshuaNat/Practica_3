@@ -72,7 +72,7 @@ def Priority():
 		obj.update_tiempos(esp, resp, ret, fin)
 		print(obj.get_tabla())
 
-def Round_Robin():
+'''def Round_Robin():
 	rr = cola.copy()
 	t_actual = 0
 	q=3
@@ -106,6 +106,25 @@ def Round_Robin():
 			obj.update_tiempos(esp, resp, ret, fin)
 			tam -= 1
 			print(obj.get_tabla())
+'''
+
+def Round_Robin(procesos):
+	rr = procesos.copy()
+	t_actual = 0
+	q = 3
+	while rr:
+		proceso = rr.pop(0)
+		if proceso.t_eje <= q:
+			t_actual += proceso.t_eje
+			proceso.t_fin = t_actual
+		else:
+			t_actual += q
+			proceso.t_eje -= q
+			rr.append(proceso)
+
+	orden = [(proceso.nombre, proceso.t_fin) for proceso in procesos]
+	return orden
+
 
 def col_inicio(filename, proceso):
         with open(filename) as file_obj:
@@ -156,7 +175,9 @@ def menu():
                 elif opcion == 3:
                         Priority()
                 elif opcion == 4:
-                        Round_Robin()
+                        orden = Round_Robin(cola)
+                        for proceso in orden:
+                        	print(f"El proceso {proceso[0]} se completo en el tiempo {proceso[1]}")
                 elif opcion == 5:
                         add_process()
                 elif opcion == 6:
